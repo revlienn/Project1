@@ -1,0 +1,20 @@
+{
+    "workbench.colorCustomizations": {
+        "[Bearded Theme Arc Blueberry]": {
+            "tab.activeBorderTop": "#ff0000",
+            "tab.activeBorder": "#ff0000",
+            "tab.activeForeground": "#ff0000",
+            "tab.inactiveBackground": "#000000"
+        },
+        "[Bearded Theme Surprising Blueberry]": {
+            "tab.activeBorderTop": "#5c0064",
+            "tab.activeBorder": "#5c0064",
+            "tab.border": "#5c0064",
+            "editorWarning.foreground": "#fca510",
+            "editorError.foreground": "#ff0000"
+        },
+        "activityBar.background": "#511642",
+        "titleBar.activeBackground": "#711F5C",
+        "titleBar.activeForeground": "#FDF8FC"
+    }
+}
