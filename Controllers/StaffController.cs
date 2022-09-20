@@ -34,5 +34,12 @@ namespace Project1.Controllers
         {
             return Ok(Staffs);
         }
+
+        [HttpPost("AddNewStaff")]
+        public ActionResult<List<Staff>> AddNewStaff(Staff newStaff)
+        {
+            Staffs.Add(newStaff);
+            return Ok(Staffs);
+        }
     }
 }
