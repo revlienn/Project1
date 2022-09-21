@@ -10,7 +10,7 @@ namespace Project1.Models
         public int Id { get; set; }
         public string Name { get; set; }
         public string Phone { get; set; }
-        public List<Contact> Contacts  {get; set; }
-        public List<Project> Projects { get; set; }
+        public List<Contact>? Contacts  {get; set; }
+        public List<Project>? Projects { get; set; }
     }
 }

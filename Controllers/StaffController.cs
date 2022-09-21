@@ -29,19 +29,19 @@ namespace Project1.Controllers
         };
 
 
-        [HttpGet("Id")]
+        [HttpGet("ById")]
         public ActionResult<Staff> GetStaffById(int Id)
         {
             return Ok(Staffs.FirstOrDefault(c=>c.Id==Id));
         }
 
-        [HttpGet("GetAll")]
+        [HttpGet("All")]
         public ActionResult<List<Staff>> GetAllStaffs()
         {
             return Ok(Staffs);
         }
 
-        [HttpGet("Name")]
+        [HttpGet("ByName")]
         public ActionResult<List<Staff>> GetStaffByName(string name)
         {
             var matchingStaff=new List<Staff>();
@@ -56,7 +56,7 @@ namespace Project1.Controllers
             return Ok(matchingStaff);
         }
 
-        [HttpPost("AddNewStaff")]
+        [HttpPost]
         public ActionResult<List<Staff>> AddNewStaff(Staff newStaff)
         {
             Staffs.Add(newStaff);
