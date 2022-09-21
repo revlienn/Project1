@@ -19,6 +19,12 @@ namespace Project1.Controllers
                 Id=2,
                 Name="John Doe",
                 Email="johndoe@email.co.uk"
+            },
+            new Staff()
+            {
+                Id=3,
+                Name="John Smith",
+                Email="johnsmith@email.co.uk"
             }
         };
 
@@ -35,11 +41,57 @@ namespace Project1.Controllers
             return Ok(Staffs);
         }
 
+        [HttpGet("Name")]
+        public ActionResult<List<Staff>> GetStaffByName(string name)
+        {
+            var matchingStaff=new List<Staff>();
+
+            foreach(Staff staff in Staffs)
+            {
+                if(staff.Name.ToLower().Contains(name))
+                {
+                    matchingStaff.Add(staff);
+                }
+            }
+            return Ok(matchingStaff);
+        }
+
         [HttpPost("AddNewStaff")]
         public ActionResult<List<Staff>> AddNewStaff(Staff newStaff)
         {
             Staffs.Add(newStaff);
             return Ok(Staffs);
+        }
+
+        [HttpPut]
+        public ActionResult<Staff> Update(Staff updatedStaff)
+        {
+            var staff=Staffs.FirstOrDefault(s=>s.Id==updatedStaff.Id);
+            if(staff==null)
+            {
+                return NotFound(staff);
+            }
+            if(staff!=null)
+            {
+                staff.Name=updatedStaff.Name;
+                staff.Email=updatedStaff.Email;
+            }
+            return Ok(staff);
+        }
+
+        [HttpDelete]
+        public ActionResult<List<Staff>> Delete(int id)
+        {
+            Staff staff=Staffs.FirstOrDefault(s=>s.Id==id);
+
+            if(staff==null)
+            {
+                return NotFound(staff);
+            }
+
+            Staffs.Remove(staff);
+            return Ok(Staffs);
+
         }
     }
 }
