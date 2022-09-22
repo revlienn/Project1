@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Project1.Services.OrganisationServices;
 
 namespace Project1.Controllers
 {
@@ -10,90 +11,72 @@ namespace Project1.Controllers
     [Route("Organisation")]
     public class OrganisationController:ControllerBase
     {
-        private List<Organisation> Organisations=new List<Organisation>
-        {
-            new Organisation()
-            {
-                Id=1,
-                Name="Thames Corporation",
-                Phone="020-90909090"
-            },
-            new Organisation()
-            {
-                Id=2,
-                Name="Big Ben",
-                Phone="020-90909090"
-            },
-            new Organisation()
-            {
-                Id=3,
-                Name="OakTree",
-                Phone="020-94638000"
-            },
-        };
+        private readonly IOrganisationService _organisationService;
 
-        [HttpGet("ById")]
-        public ActionResult<Organisation> GetOrganisationById(int Id)
+        public OrganisationController(IOrganisationService organisationService)
         {
-            return Ok(Organisations.FirstOrDefault(c=>c.Id==Id));
-        }
-
-        [HttpGet("All")]
-        public ActionResult<List<Organisation>> GetAllOrganisations()
-        {
-            return Ok(Organisations);
-        }
-
-        [HttpGet("ByName")]
-        public ActionResult<List<Organisation>> GetOrganisationByName(string name)
-        {
-            var matchingOrganisation=new List<Organisation>();
-
-            foreach(Organisation organisation in Organisations)
-            {
-                if(organisation.Name.ToLower().Contains(name))
-                {
-                    matchingOrganisation.Add(organisation);
-                }
-            }
-            return Ok(matchingOrganisation);
+            _organisationService = organisationService;
         }
 
         [HttpPost]
-        public ActionResult<List<Organisation>> AddNewOrganisation(Organisation newOrganisation)
-        {
-            Organisations.Add(newOrganisation);
-            return Ok(Organisations);
+        public async Task<ActionResult<Organisation>> AddNew(Organisation newOrganisation)
+        {   
+            var addedOrganisation=await _organisationService.AddNew(newOrganisation);
+            if(addedOrganisation==null)
+            {
+                return StatusCode(409,"Id already exists");
+            }
+            return Ok(addedOrganisation);
         }
 
         [HttpPut]
-        public ActionResult<Organisation> Update(Organisation updatedOrganisation)
+        public async Task<ActionResult<Organisation>> Update(Organisation updatedOrganisation)
         {
-            var organisation=Organisations.FirstOrDefault(s=>s.Id==updatedOrganisation.Id);
-            if(organisation==null)
+            var checkOrganisation=await _organisationService.Update(updatedOrganisation);
+            if(checkOrganisation==null)
             {
-                return NotFound(organisation);
+                return StatusCode(404,"Id Not Found");
             }
-            if(organisation!=null)
-            {
-                organisation.Name=updatedOrganisation.Name;
-                organisation.Phone=updatedOrganisation.Phone;
-            }
-            return Ok(organisation);
+            return Ok(checkOrganisation);
         }
 
         [HttpDelete]
-        public ActionResult<List<Organisation>> Delete(int id)
+        public async Task<ActionResult<List<Organisation>>> Delete(int id)
         {
-            Organisation organisation=Organisations.FirstOrDefault(o=>o.Id==id);
-
-            if(organisation==null)
+            var toDelete=await _organisationService.Delete(id);
+            if(toDelete==null)
             {
-                return NotFound(organisation);
+                return StatusCode(404,"Id Not Found");
             }
+            return Ok(toDelete);
+        }
 
-            Organisations.Remove(organisation);
-            return Ok(Organisations);
+        [HttpGet("All")]
+        public async Task<ActionResult<List<Organisation>>> GetAll()
+        {
+            return Ok(await _organisationService.GetAll());
+        }
+
+        [HttpGet("ById")]
+        public async Task<ActionResult<Organisation>> GetById(int id)
+        {
+            var checkId=await _organisationService.GetById(id);
+            if(checkId==null)
+            {
+                return NotFound(checkId);
+            }
+            return Ok(checkId);
+        }
+
+        [HttpGet("ByName")]
+        public async Task<ActionResult<List<Organisation>>> GetByName(string name)
+        {
+            var matchedOrganisations=await _organisationService.GetByName(name);
+            if (matchedOrganisations==null)
+            {
+                return StatusCode(404,"No matching users");
+            }
+            return matchedOrganisations;
         }
     }
 }

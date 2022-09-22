@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Project1.Services.StaffServices;
 
 namespace Project1.Controllers
 {
@@ -11,87 +12,58 @@ namespace Project1.Controllers
     public class StaffController:ControllerBase
     {
 
-        private List<Staff> Staffs=new List<Staff>
+        private readonly IStaffService _staffService;
+        public StaffController(IStaffService staffService)
         {
-            new Staff(),
-            new Staff()
-            {
-                Id=2,
-                Name="John Doe",
-                Email="johndoe@email.co.uk"
-            },
-            new Staff()
-            {
-                Id=3,
-                Name="John Smith",
-                Email="johnsmith@email.co.uk"
-            }
-        };
-
-
-        [HttpGet("ById")]
-        public ActionResult<Staff> GetStaffById(int Id)
-        {
-            return Ok(Staffs.FirstOrDefault(c=>c.Id==Id));
+            _staffService = staffService;
         }
+        private readonly IStaffService staffService;
 
-        [HttpGet("All")]
-        public ActionResult<List<Staff>> GetAllStaffs()
-        {
-            return Ok(Staffs);
-        }
-
-        [HttpGet("ByName")]
-        public ActionResult<List<Staff>> GetStaffByName(string name)
-        {
-            var matchingStaff=new List<Staff>();
-
-            foreach(Staff staff in Staffs)
-            {
-                if(staff.Name.ToLower().Contains(name))
-                {
-                    matchingStaff.Add(staff);
-                }
-            }
-            return Ok(matchingStaff);
-        }
 
         [HttpPost]
-        public ActionResult<List<Staff>> AddNewStaff(Staff newStaff)
+        public async Task<ActionResult<List<Staff>>> AddNewStaff(Staff newStaff)
         {
-            Staffs.Add(newStaff);
-            return Ok(Staffs);
+            return Ok(await _staffService.AddNewStaff(newStaff));
         }
 
         [HttpPut]
-        public ActionResult<Staff> Update(Staff updatedStaff)
+        public async Task<ActionResult<Staff>> Update(Staff updatedStaff)
         {
-            var staff=Staffs.FirstOrDefault(s=>s.Id==updatedStaff.Id);
-            if(staff==null)
-            {
-                return NotFound(staff);
-            }
-            if(staff!=null)
-            {
-                staff.Name=updatedStaff.Name;
-                staff.Email=updatedStaff.Email;
-            }
-            return Ok(staff);
+            return Ok(await _staffService.Update(updatedStaff));
         }
 
         [HttpDelete]
-        public ActionResult<List<Staff>> Delete(int id)
+        public async Task<ActionResult<List<Staff>>> Delete(int id)
         {
-            Staff staff=Staffs.FirstOrDefault(s=>s.Id==id);
-
-            if(staff==null)
-            {
-                return NotFound(staff);
-            }
-
-            Staffs.Remove(staff);
-            return Ok(Staffs);
-
+            return Ok(await _staffService.Delete(id));
         }
+
+        [HttpGet("All")]
+        public async Task<ActionResult<List<Staff>>> GetAllStaffs()
+        {
+            return Ok(await _staffService.GetAllStaffs());
+        }
+
+        [HttpGet("ById")]
+        public async Task<ActionResult<Staff>> GetStaffById(int id)
+        {
+            return Ok (await _staffService.GetStaffById(id));
+        }
+
+        [HttpGet("ByName")]
+        public async Task<ActionResult<List<Staff>>> GetStaffByName (string name)
+        {
+            return Ok(await _staffService.GetStaffByName(name));
+        }
+
+
     }
 }
+
+/*
+if(modifiedStaff==null)
+            {
+                return StatusCode(404,"Operation Not Completed. Wrong User Id.");
+
+            }
+*/
