@@ -29,34 +29,56 @@ namespace Project1.Services.OrganisationServices
             },
         };
 
-        public async Task<Organisation> AddNew(Organisation newOrganisation)
+        public async Task<ServiceResponse<Organisation>> AddNew(Organisation newOrganisation)
         {
+            var serviceResponse=new ServiceResponse<Organisation>();
+
             var checkOrganisation=Organisations.FirstOrDefault(c=>c.Id==newOrganisation.Id);
             if(checkOrganisation!=null)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {newOrganisation.Id} has been assigned to a different Organisation";
+                return serviceResponse;
             }
             Organisations.Add(newOrganisation);
-            return newOrganisation;
+
+            serviceResponse.Data=newOrganisation;
+            serviceResponse.Message=$"Organisation {newOrganisation.Id} successfully added.";
+            return serviceResponse;
         }
 
-        public async Task<List<Organisation>> GetAll()
+        public async Task<ServiceResponse<List<Organisation>>> GetAll()
         {
-            return Organisations;
+            var serviceResponse=new ServiceResponse<List<Organisation>>();
+
+            serviceResponse.Data=Organisations;
+
+            return serviceResponse;
         }
 
-        public async Task<Organisation> GetById(int id)
+        public async Task<ServiceResponse<Organisation>> GetById(int id)
         {
+            var serviceResponse=new ServiceResponse<Organisation>();
+
             var checkId=Organisations.FirstOrDefault(c=>c.Id==id);
             if(checkId==null)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {id} Not Found";
+                return serviceResponse;
             }
-            return checkId;
+
+            serviceResponse.Data=checkId;
+
+            return serviceResponse;
         }
 
-        public async Task<List<Organisation>> GetByName(string name)
+        public async Task<ServiceResponse<List<Organisation>>> GetByName(string name)
         {
+            var serviceResponse=new ServiceResponse<List<Organisation>>();
+
             var matchedOrganisations=new List<Organisation>();
             foreach(Organisation Organisation in Organisations)
             {
@@ -67,35 +89,57 @@ namespace Project1.Services.OrganisationServices
             }
             if(matchedOrganisations.Count==0)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Name containing {name} Not Found";
+                return serviceResponse;
             }
-            return matchedOrganisations;
+            
+            serviceResponse.Data=matchedOrganisations;
+            
+            return serviceResponse;
         }
 
-        public async Task<Organisation> Update(Organisation updatedOrganisation)
+        public async Task<ServiceResponse<Organisation>> Update(Organisation updatedOrganisation)
         {
+            var serviceResponse=new ServiceResponse<Organisation>();
+
             var checkOrganisation=Organisations.FirstOrDefault(c=>c.Id==updatedOrganisation.Id);
             if(checkOrganisation==null)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {updatedOrganisation.Id} Not Found";
+                return serviceResponse;
             }
             checkOrganisation.Name=updatedOrganisation.Name;
             checkOrganisation.Phone=updatedOrganisation.Phone;
             checkOrganisation.Contacts=updatedOrganisation.Contacts;
             checkOrganisation.Projects=updatedOrganisation.Projects;
 
-            return checkOrganisation;
+            serviceResponse.Data=checkOrganisation;
+            
+            return serviceResponse;
         }
 
-        public async Task<List<Organisation>> Delete(int id)
+        public async Task<ServiceResponse<List<Organisation>>> Delete(int id)
         {
+            var serviceResponse=new ServiceResponse<List<Organisation>>();
+
             var toDelete=Organisations.FirstOrDefault(c=>c.Id==id);
+
             if(toDelete==null)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {id} Not Found";
+                return serviceResponse;
             }
             Organisations.Remove(toDelete);
-            return Organisations;
+
+            serviceResponse.Data=Organisations;
+
+            return serviceResponse;
         }
     }
 }

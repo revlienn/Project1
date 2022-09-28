@@ -7,12 +7,12 @@ namespace Project1.Services.ContactServices
 {
     public interface IContactService
     {
-        Task<List<Contact>> GetAll();
-        Task<Contact> GetById(int id);
-        Task<List<Contact>> GetByName(string name);
-        Task<Contact> AddNew(Contact newContact);
-        Task<Contact> Update(Contact updatedContact);
-        Task<List<Contact>> Delete(int id);
+        Task<ServiceResponse<List<Contact>>> GetAll();
+        Task<ServiceResponse<Contact>> GetById(int id);
+        Task<ServiceResponse<List<Contact>>> GetByName(string name);
+        Task<ServiceResponse<Contact>> AddNew(Contact newContact);
+        Task<ServiceResponse<Contact>> Update(Contact updatedContact);
+        Task<ServiceResponse<List<Contact>>> Delete(int id);
 
     }
 }

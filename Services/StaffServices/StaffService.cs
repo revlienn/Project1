@@ -2,11 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Project1.Dtos.Staff;
 
 namespace Project1.Services.StaffServices
 {
     public class StaffService : IStaffService
     {
+
+        private readonly IMapper _mapper;
+        public StaffService(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
         private List<Staff> Staffs=new List<Staff>
         {
             new Staff(),
@@ -24,68 +32,128 @@ namespace Project1.Services.StaffServices
             }
         };
 
-        public async Task<List<Staff>> AddNewStaff(Staff newStaff)
-        {
-            Staffs.Add(newStaff);
-            return Staffs;
-        }
+        public IMapper Mapper { get; }
 
-        public async Task<List<Staff>> Delete(int id)
+        public async Task<ServiceResponse<GetDto>> AddNew(AddDto newStaff)
         {
-            Staff staff=Staffs.FirstOrDefault(s=>s.Id==id);
-            if(staff==null)
+            var serviceResponse=new ServiceResponse<GetDto>();
+
+            // automate in efcore
+            /*
+            var checkStaff=Staffs.FirstOrDefault(c=>c.Id==newStaff.Id); 
+
+            if(checkStaff!=null)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {newStaff.Id} has been assigned to a different user";
+                return serviceResponse;
             }
-            Staffs.Remove(staff);
-            return Staffs;
+            */
+
+            var addedStaff=_mapper.Map<Staff>(newStaff);
+            addedStaff.Id=Staffs.Max(c=>c.Id)+1;
+
+            Staffs.Add(addedStaff);
+
+            serviceResponse.Data=_mapper.Map<GetDto>(addedStaff);
+
+            serviceResponse.Message=$"User {newStaff.Name} successfully added.";
+
+            return serviceResponse;
         }
 
-        public async Task<List<Staff>> GetAllStaffs()
+        public async Task<ServiceResponse<List<GetDto>>> GetAll()
         {
-            return Staffs;
+            var serviceResponse=new ServiceResponse<List<GetDto>>();
+
+            serviceResponse.Data=Staffs.Select(s=>_mapper.Map<GetDto>(s)).ToList();
+
+            return serviceResponse;
         }
 
-        public async Task<Staff> GetStaffById(int id)
-        {   
-            return Staffs.FirstOrDefault(s=>s.Id==id);
-        }
-
-        public async Task<List<Staff>> GetStaffByName(string name)
+        public async Task<ServiceResponse<GetDto>> GetById(int id)
         {
-            var matchingStaff=new List<Staff>();
+            var serviceResponse=new ServiceResponse<GetDto>();
+
+            var checkId=Staffs.FirstOrDefault(c=>c.Id==id);
+            if(checkId==null)
+            {
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {id} Not Found";
+                return serviceResponse;
+            }
+
+            serviceResponse.Data=_mapper.Map<GetDto>(checkId);
+
+            return serviceResponse;
+        }
+
+        public async Task<ServiceResponse<List<GetDto>>> GetByName(string name)
+        {
+            var serviceResponse=new ServiceResponse<List<GetDto>>();
+
+            var matchedStaffs=new List<Staff>();
 
             foreach(Staff staff in Staffs)
             {
                 if(staff.Name.ToLower().Contains(name))
                 {
-                    matchingStaff.Add(staff);
+                    matchedStaffs.Add(staff);
                 }
             }
-
-            return matchingStaff;
+            if(matchedStaffs.Count==0)
+            {
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Name containing {name} Not Found";
+                return serviceResponse;
+            }
+            
+            serviceResponse.Data=matchedStaffs.Select(s=>_mapper.Map<GetDto>(s)).ToList();
+            
+            return serviceResponse;
         }
 
-        public async Task<Staff> Update(Staff updatedStaff)
+        public async Task<ServiceResponse<GetDto>> Update(UpdateDto updatedStaff)
         {
-            var staff=Staffs.FirstOrDefault(s=>s.Id==updatedStaff.Id);
-            staff.Name=updatedStaff.Name;
-            staff.Email=updatedStaff.Email;
-            return staff;
+            var serviceResponse=new ServiceResponse<GetDto>();
 
-            /*
-            var staff=Staffs.FirstOrDefault(s=>s.Id==updatedStaff.Id);
-            if(staff==null)
+            var checkStaff=Staffs.FirstOrDefault(c=>c.Id==updatedStaff.Id);
+            if(checkStaff==null)
             {
-                return NotFound(staff);
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {updatedStaff.Id} Not Found";
+                return serviceResponse;
             }
-            if(staff!=null)
+            checkStaff.Name=updatedStaff.Name;
+            checkStaff.Email=updatedStaff.Email;
+
+            serviceResponse.Data=_mapper.Map<GetDto>(checkStaff);
+            
+            return serviceResponse;
+        }
+
+        public async Task<ServiceResponse<List<GetDto>>> Delete(int id)
+        {
+            var serviceResponse=new ServiceResponse<List<GetDto>>();
+
+            var toDelete=Staffs.FirstOrDefault(c=>c.Id==id);
+
+            if(toDelete==null)
             {
-                staff.Name=updatedStaff.Name;
-                staff.Email=updatedStaff.Email;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {id} Not Found";
+                return serviceResponse;
             }
-            return Ok(staff);
-            */
+            Staffs.Remove(toDelete);
+
+            serviceResponse.Data=Staffs.Select(s=>_mapper.Map<GetDto>(s)).ToList();
+
+            return serviceResponse;
         }
     }
 }

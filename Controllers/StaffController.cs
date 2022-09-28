@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Project1.Dtos.Staff;
 using Project1.Services.StaffServices;
 
 namespace Project1.Controllers
@@ -17,43 +18,67 @@ namespace Project1.Controllers
         {
             _staffService = staffService;
         }
-        private readonly IStaffService staffService;
 
 
         [HttpPost]
-        public async Task<ActionResult<List<Staff>>> AddNewStaff(Staff newStaff)
-        {
-            return Ok(await _staffService.AddNewStaff(newStaff));
+        public async Task<ActionResult<ServiceResponse<GetDto>>> AddNew(AddDto newStaff)
+        {   
+            var addedStaff=await _staffService.AddNew(newStaff);
+            if(addedStaff.Data==null)
+            {
+                return Conflict(addedStaff);
+            }
+            return Ok(addedStaff);
         }
 
         [HttpPut]
-        public async Task<ActionResult<Staff>> Update(Staff updatedStaff)
+        public async Task<ActionResult<ServiceResponse<GetDto>>> Update(UpdateDto updatedStaff)
         {
-            return Ok(await _staffService.Update(updatedStaff));
+            var checkStaff=await _staffService.Update(updatedStaff);
+            if(checkStaff.Data==null)
+            {
+                return StatusCode(404,"Id Not Found");
+            }
+            return Ok(checkStaff);
         }
 
         [HttpDelete]
-        public async Task<ActionResult<List<Staff>>> Delete(int id)
+        public async Task<ActionResult<ServiceResponse<List<GetDto>>>> Delete(int id)
         {
-            return Ok(await _staffService.Delete(id));
+            var toDelete=await _staffService.Delete(id);
+            if(toDelete.Data==null)
+            {
+                return StatusCode(404,"Id Not Found");
+            }
+            return Ok(toDelete);
         }
 
         [HttpGet("All")]
-        public async Task<ActionResult<List<Staff>>> GetAllStaffs()
+        public async Task<ActionResult<ServiceResponse<List<GetDto>>>> GetAll()
         {
-            return Ok(await _staffService.GetAllStaffs());
+            return Ok(await _staffService.GetAll());
         }
 
         [HttpGet("ById")]
-        public async Task<ActionResult<Staff>> GetStaffById(int id)
+        public async Task<ActionResult<ServiceResponse<GetDto>>> GetById(int id)
         {
-            return Ok (await _staffService.GetStaffById(id));
+            var checkId=await _staffService.GetById(id);
+            if(checkId.Data==null)
+            {
+                return NotFound(checkId);
+            }
+            return Ok(checkId);
         }
 
         [HttpGet("ByName")]
-        public async Task<ActionResult<List<Staff>>> GetStaffByName (string name)
+        public async Task<ActionResult<ServiceResponse<List<GetDto>>>> GetByName(string name)
         {
-            return Ok(await _staffService.GetStaffByName(name));
+            var matchedStaffs=await _staffService.GetByName(name);
+            if (matchedStaffs.Data==null)
+            {
+                return StatusCode(404,"No matching users");
+            }
+            return matchedStaffs;
         }
 
 

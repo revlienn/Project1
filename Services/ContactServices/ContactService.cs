@@ -29,34 +29,56 @@ namespace Project1.Services.ContactServices
             },
         };
 
-        public async Task<Contact> AddNew(Contact newContact)
+        public async Task<ServiceResponse<Contact>> AddNew(Contact newContact)
         {
+            var serviceResponse=new ServiceResponse<Contact>();
+
             var checkContact=Contacts.FirstOrDefault(c=>c.Id==newContact.Id);
             if(checkContact!=null)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {newContact.Id} has been assigned to a different user";
+                return serviceResponse;
             }
             Contacts.Add(newContact);
-            return newContact;
+
+            serviceResponse.Data=newContact;
+            serviceResponse.Message=$"User {newContact.Name} successfully added.";
+            return serviceResponse;
         }
 
-        public async Task<List<Contact>> GetAll()
+        public async Task<ServiceResponse<List<Contact>>> GetAll()
         {
-            return Contacts;
+            var serviceResponse=new ServiceResponse<List<Contact>>();
+
+            serviceResponse.Data=Contacts;
+
+            return serviceResponse;
         }
 
-        public async Task<Contact> GetById(int id)
+        public async Task<ServiceResponse<Contact>> GetById(int id)
         {
+            var serviceResponse=new ServiceResponse<Contact>();
+
             var checkId=Contacts.FirstOrDefault(c=>c.Id==id);
             if(checkId==null)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {id} Not Found";
+                return serviceResponse;
             }
-            return checkId;
+
+            serviceResponse.Data=checkId;
+
+            return serviceResponse;
         }
 
-        public async Task<List<Contact>> GetByName(string name)
+        public async Task<ServiceResponse<List<Contact>>> GetByName(string name)
         {
+            var serviceResponse=new ServiceResponse<List<Contact>>();
+
             var matchedContacts=new List<Contact>();
             foreach(Contact contact in Contacts)
             {
@@ -67,34 +89,56 @@ namespace Project1.Services.ContactServices
             }
             if(matchedContacts.Count==0)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Name containing {name} Not Found";
+                return serviceResponse;
             }
-            return matchedContacts;
+            
+            serviceResponse.Data=matchedContacts;
+            
+            return serviceResponse;
         }
 
-        public async Task<Contact> Update(Contact updatedContact)
+        public async Task<ServiceResponse<Contact>> Update(Contact updatedContact)
         {
+            var serviceResponse=new ServiceResponse<Contact>();
+
             var checkContact=Contacts.FirstOrDefault(c=>c.Id==updatedContact.Id);
             if(checkContact==null)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {updatedContact.Id} Not Found";
+                return serviceResponse;
             }
             checkContact.Name=updatedContact.Name;
             checkContact.Email=updatedContact.Email;
             checkContact.OrganisationId=updatedContact.OrganisationId;
 
-            return checkContact;
+            serviceResponse.Data=checkContact;
+            
+            return serviceResponse;
         }
 
-        public async Task<List<Contact>> Delete(int id)
+        public async Task<ServiceResponse<List<Contact>>> Delete(int id)
         {
+            var serviceResponse=new ServiceResponse<List<Contact>>();
+
             var toDelete=Contacts.FirstOrDefault(c=>c.Id==id);
+
             if(toDelete==null)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {id} Not Found";
+                return serviceResponse;
             }
             Contacts.Remove(toDelete);
-            return Contacts;
+
+            serviceResponse.Data=Contacts;
+
+            return serviceResponse;
         }
     }
 }

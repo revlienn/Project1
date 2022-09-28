@@ -7,11 +7,11 @@ namespace Project1.Services.OrganisationServices
 {
     public interface IOrganisationService
     {
-        Task<Organisation> AddNew(Organisation newOrganisation);
-        Task<Organisation> Update(Organisation updatedOrganisation);
-        Task<List<Organisation>> Delete(int id);
-        Task<List<Organisation>> GetAll();
-        Task<Organisation> GetById(int id);
-        Task<List<Organisation>> GetByName(string name);
+        Task<ServiceResponse<List<Organisation>>> GetAll();
+        Task<ServiceResponse<Organisation>> GetById(int id);
+        Task<ServiceResponse<List<Organisation>>> GetByName(string name);
+        Task<ServiceResponse<Organisation>> AddNew(Organisation newOrganisation);
+        Task<ServiceResponse<Organisation>> Update(Organisation updatedOrganisation);
+        Task<ServiceResponse<List<Organisation>>> Delete(int id);
     }
 }

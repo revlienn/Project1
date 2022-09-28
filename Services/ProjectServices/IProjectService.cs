@@ -7,11 +7,11 @@ namespace Project1.Services.ProjectServices
 {
     public interface IProjectService
     {
-        Task<List<Project>> GetAll();
-        Task<Project> GetById(int id);
-        Task<List<Project>> GetByName(string name);
-        Task<Project> AddNew(Project newProject);
-        Task<Project> Update(Project updatedProject);
-        Task<List<Project>> Delete(int id);
+        Task<ServiceResponse<List<Project>>> GetAll();
+        Task<ServiceResponse<Project>> GetById(int id);
+        Task<ServiceResponse<List<Project>>> GetByName(string name);
+        Task<ServiceResponse<Project>> AddNew(Project newProject);
+        Task<ServiceResponse<Project>> Update(Project updatedProject);
+        Task<ServiceResponse<List<Project>>> Delete(int id);
     }
 }

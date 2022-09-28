@@ -19,21 +19,21 @@ namespace Project1.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Organisation>> AddNew(Organisation newOrganisation)
+        public async Task<ActionResult<ServiceResponse<Organisation>>> AddNew(Organisation newOrganisation)
         {   
             var addedOrganisation=await _organisationService.AddNew(newOrganisation);
-            if(addedOrganisation==null)
+            if(addedOrganisation.Data==null)
             {
-                return StatusCode(409,"Id already exists");
+                return Conflict(addedOrganisation);
             }
             return Ok(addedOrganisation);
         }
 
         [HttpPut]
-        public async Task<ActionResult<Organisation>> Update(Organisation updatedOrganisation)
+        public async Task<ActionResult<ServiceResponse<Organisation>>> Update(Organisation updatedOrganisation)
         {
             var checkOrganisation=await _organisationService.Update(updatedOrganisation);
-            if(checkOrganisation==null)
+            if(checkOrganisation.Data==null)
             {
                 return StatusCode(404,"Id Not Found");
             }
@@ -41,10 +41,10 @@ namespace Project1.Controllers
         }
 
         [HttpDelete]
-        public async Task<ActionResult<List<Organisation>>> Delete(int id)
+        public async Task<ActionResult<ServiceResponse<List<Organisation>>>> Delete(int id)
         {
             var toDelete=await _organisationService.Delete(id);
-            if(toDelete==null)
+            if(toDelete.Data==null)
             {
                 return StatusCode(404,"Id Not Found");
             }
@@ -52,16 +52,16 @@ namespace Project1.Controllers
         }
 
         [HttpGet("All")]
-        public async Task<ActionResult<List<Organisation>>> GetAll()
+        public async Task<ActionResult<ServiceResponse<List<Organisation>>>> GetAll()
         {
             return Ok(await _organisationService.GetAll());
         }
 
         [HttpGet("ById")]
-        public async Task<ActionResult<Organisation>> GetById(int id)
+        public async Task<ActionResult<ServiceResponse<Organisation>>> GetById(int id)
         {
             var checkId=await _organisationService.GetById(id);
-            if(checkId==null)
+            if(checkId.Data==null)
             {
                 return NotFound(checkId);
             }
@@ -69,12 +69,12 @@ namespace Project1.Controllers
         }
 
         [HttpGet("ByName")]
-        public async Task<ActionResult<List<Organisation>>> GetByName(string name)
+        public async Task<ActionResult<ServiceResponse<List<Organisation>>>> GetByName(string name)
         {
             var matchedOrganisations=await _organisationService.GetByName(name);
-            if (matchedOrganisations==null)
+            if (matchedOrganisations.Data==null)
             {
-                return StatusCode(404,"No matching users");
+                return NotFound(matchedOrganisations);
             }
             return matchedOrganisations;
         }

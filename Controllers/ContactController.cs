@@ -19,21 +19,21 @@ namespace Project1.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Contact>> AddNew(Contact newContact)
+        public async Task<ActionResult<ServiceResponse<Contact>>> AddNew(Contact newContact)
         {   
             var addedContact=await _contactService.AddNew(newContact);
-            if(addedContact==null)
+            if(addedContact.Data==null)
             {
-                return StatusCode(409,"Id already exists");
+                return Conflict(addedContact);
             }
             return Ok(addedContact);
         }
 
         [HttpPut]
-        public async Task<ActionResult<Contact>> Update(Contact updatedContact)
+        public async Task<ActionResult<ServiceResponse<Contact>>> Update(Contact updatedContact)
         {
             var checkContact=await _contactService.Update(updatedContact);
-            if(checkContact==null)
+            if(checkContact.Data==null)
             {
                 return StatusCode(404,"Id Not Found");
             }
@@ -41,10 +41,10 @@ namespace Project1.Controllers
         }
 
         [HttpDelete]
-        public async Task<ActionResult<List<Contact>>> Delete(int id)
+        public async Task<ActionResult<ServiceResponse<List<Contact>>>> Delete(int id)
         {
             var toDelete=await _contactService.Delete(id);
-            if(toDelete==null)
+            if(toDelete.Data==null)
             {
                 return StatusCode(404,"Id Not Found");
             }
@@ -52,16 +52,16 @@ namespace Project1.Controllers
         }
 
         [HttpGet("All")]
-        public async Task<ActionResult<List<Contact>>> GetAll()
+        public async Task<ActionResult<ServiceResponse<List<Contact>>>> GetAll()
         {
             return Ok(await _contactService.GetAll());
         }
 
         [HttpGet("ById")]
-        public async Task<ActionResult<Contact>> GetById(int id)
+        public async Task<ActionResult<ServiceResponse<Contact>>> GetById(int id)
         {
             var checkId=await _contactService.GetById(id);
-            if(checkId==null)
+            if(checkId.Data==null)
             {
                 return NotFound(checkId);
             }
@@ -69,10 +69,10 @@ namespace Project1.Controllers
         }
 
         [HttpGet("ByName")]
-        public async Task<ActionResult<List<Contact>>> GetByName(string name)
+        public async Task<ActionResult<ServiceResponse<List<Contact>>>> GetByName(string name)
         {
             var matchedContacts=await _contactService.GetByName(name);
-            if (matchedContacts==null)
+            if (matchedContacts.Data==null)
             {
                 return StatusCode(404,"No matching users");
             }

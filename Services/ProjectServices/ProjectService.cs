@@ -24,73 +24,117 @@ namespace Project1.Services.ProjectServices
             },
         };
         
-        public async Task<Project> AddNew(Project newProject)
+        public async Task<ServiceResponse<Project>> AddNew(Project newProject)
         {
+            var serviceResponse=new ServiceResponse<Project>();
+
             var checkProject=Projects.FirstOrDefault(c=>c.Id==newProject.Id);
             if(checkProject!=null)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {newProject.Id} has been assigned to a different project";
+                return serviceResponse;
             }
             Projects.Add(newProject);
-            return newProject;
+
+            serviceResponse.Data=newProject;
+            serviceResponse.Message=$"Project {newProject.Id} successfully added.";
+            return serviceResponse;
         }
 
-        public async Task<List<Project>> GetAll()
+        public async Task<ServiceResponse<List<Project>>> GetAll()
         {
-            return Projects;
+            var serviceResponse=new ServiceResponse<List<Project>>();
+
+            serviceResponse.Data=Projects;
+
+            return serviceResponse;
         }
 
-        public async Task<Project> GetById(int id)
+        public async Task<ServiceResponse<Project>> GetById(int id)
         {
+            var serviceResponse=new ServiceResponse<Project>();
+
             var checkId=Projects.FirstOrDefault(c=>c.Id==id);
             if(checkId==null)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {id} Not Found";
+                return serviceResponse;
             }
-            return checkId;
+
+            serviceResponse.Data=checkId;
+
+            return serviceResponse;
         }
 
-        public async Task<List<Project>> GetByName(string name)
+        public async Task<ServiceResponse<List<Project>>> GetByName(string name)
         {
+            var serviceResponse=new ServiceResponse<List<Project>>();
+
             var matchedProjects=new List<Project>();
-            foreach(Project project in Projects)
+            foreach(Project Project in Projects)
             {
-                if(project.Name.ToLower().Contains(name))
+                if(Project.Name.ToLower().Contains(name))
                 {
-                    matchedProjects.Add(project);
+                    matchedProjects.Add(Project);
                 }
             }
             if(matchedProjects.Count==0)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Name containing {name} Not Found";
+                return serviceResponse;
             }
-            return matchedProjects;
+            
+            serviceResponse.Data=matchedProjects;
+            
+            return serviceResponse;
         }
 
-        public async Task<Project> Update(Project updatedProject)
+        public async Task<ServiceResponse<Project>> Update(Project updatedProject)
         {
+            var serviceResponse=new ServiceResponse<Project>();
+
             var checkProject=Projects.FirstOrDefault(c=>c.Id==updatedProject.Id);
             if(checkProject==null)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {updatedProject.Id} Not Found";
+                return serviceResponse;
             }
             checkProject.Name=updatedProject.Name;
             checkProject.AccAmount=updatedProject.AccAmount;
             checkProject.MainContact=updatedProject.MainContact;
             checkProject.Staffs=updatedProject.Staffs;
 
-            return checkProject;
+            serviceResponse.Data=checkProject;
+            
+            return serviceResponse;
         }
 
-        public async Task<List<Project>> Delete(int id)
+        public async Task<ServiceResponse<List<Project>>> Delete(int id)
         {
+            var serviceResponse=new ServiceResponse<List<Project>>();
+
             var toDelete=Projects.FirstOrDefault(c=>c.Id==id);
+
             if(toDelete==null)
             {
-                return null;
+                serviceResponse.Data=null;
+                serviceResponse.Success=false;
+                serviceResponse.Message=$"Id {id} Not Found";
+                return serviceResponse;
             }
             Projects.Remove(toDelete);
-            return Projects;
+
+            serviceResponse.Data=Projects;
+
+            return serviceResponse;
         }
     }
     

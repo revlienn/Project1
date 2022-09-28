@@ -10,6 +10,6 @@ namespace Project1.Models
         public int Id { get; set; }=int.MinValue;
         public string Name { get; set; }=string.Empty;
         public string Email { get; set; }=string.Empty;
-        public int OrganisationId { get; set; }=int.MinValue;
+        public int OrganisationId { get; set; }=-1;
     }
 }
