@@ -120,7 +120,31 @@ namespace Project1.Services.StaffServices
         {
             var serviceResponse=new ServiceResponse<GetDto>();
 
-            var checkStaff=Staffs.FirstOrDefault(c=>c.Id==updatedStaff.Id);
+            try
+            {
+                var checkStaff=Staffs.FirstOrDefault(c=>c.Id==updatedStaff.Id);
+                if(checkStaff==null)
+                    {
+                        serviceResponse.Data=null;
+                        serviceResponse.Success=false;
+                        serviceResponse.Message=$"Id {updatedStaff.Id} Not Found";
+                        return serviceResponse;
+                    }
+                checkStaff.Name=updatedStaff.Name;
+                checkStaff.Email=updatedStaff.Email;
+
+                serviceResponse.Data=_mapper.Map<GetDto>(checkStaff);
+
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success=false;
+                serviceResponse.Message=ex.Message;
+            }
+
+            return serviceResponse;
+
+            /*
             if(checkStaff==null)
             {
                 serviceResponse.Data=null;
@@ -134,6 +158,7 @@ namespace Project1.Services.StaffServices
             serviceResponse.Data=_mapper.Map<GetDto>(checkStaff);
             
             return serviceResponse;
+            */
         }
 
         public async Task<ServiceResponse<List<GetDto>>> Delete(int id)
