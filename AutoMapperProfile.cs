@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Project1.Dtos.Contact;
 using Project1.Dtos.Staff;
 
 namespace Project1
@@ -13,6 +14,10 @@ namespace Project1
         {
             CreateMap<AddDto,Staff>();
             CreateMap<Staff,GetDto>();
+
+            CreateMap<AddContactDto,Contact>();
+            CreateMap<UpdateContactDto,Contact>();
+            CreateMap<Contact,GetContactDto>();
             
         }
     }

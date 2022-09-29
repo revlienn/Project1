@@ -2,11 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Project1.Dtos.Contact;
 
 namespace Project1.Services.ContactServices
 {
     public class ContactService:IContactService
     {
+
+        private readonly IMapper _mapper;
+        public ContactService(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
         private List<Contact> Contacts=new List<Contact>
         {
             new Contact()
@@ -29,55 +37,75 @@ namespace Project1.Services.ContactServices
             },
         };
 
-        public async Task<ServiceResponse<Contact>> AddNew(Contact newContact)
+        public async Task<ServiceResponse<GetContactDto>> AddNew(AddContactDto newContact)
         {
-            var serviceResponse=new ServiceResponse<Contact>();
+            var serviceResponse=new ServiceResponse<GetContactDto>();
+            var convContact=_mapper.Map<Contact>(newContact);
 
-            var checkContact=Contacts.FirstOrDefault(c=>c.Id==newContact.Id);
-            if(checkContact!=null)
-            {
-                serviceResponse.Data=null;
+            try
+                {
+                var checkContact=Contacts.FirstOrDefault(c=>c.Id==convContact.Id);
+                if(checkContact==null)
+                    {
+                    Contacts.Add(convContact);
+                    serviceResponse.Data=_mapper.Map<GetContactDto>(convContact);
+                    serviceResponse.Message=$"User {convContact.Name} successfully added.";
+                    }
+
+                else
+                    {
+                    serviceResponse.Data=null;
+                    serviceResponse.Success=false;
+                    serviceResponse.Message=$"Id {convContact.Id} has been assigned to a different user";
+                    }
+                }
+            catch(Exception ex)
+                {
                 serviceResponse.Success=false;
-                serviceResponse.Message=$"Id {newContact.Id} has been assigned to a different user";
-                return serviceResponse;
-            }
-            Contacts.Add(newContact);
-
-            serviceResponse.Data=newContact;
-            serviceResponse.Message=$"User {newContact.Name} successfully added.";
+                serviceResponse.Message=ex.Message;
+                }
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<Contact>>> GetAll()
+        public async Task<ServiceResponse<List<GetContactDto>>> GetAll()
         {
-            var serviceResponse=new ServiceResponse<List<Contact>>();
+            var serviceResponse=new ServiceResponse<List<GetContactDto>>();
 
-            serviceResponse.Data=Contacts;
+            serviceResponse.Data=Contacts.Select(c=>_mapper.Map<GetContactDto>(c)).ToList();
 
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<Contact>> GetById(int id)
+        public async Task<ServiceResponse<GetContactDto>> GetById(int id)
         {
-            var serviceResponse=new ServiceResponse<Contact>();
-
+            var serviceResponse=new ServiceResponse<GetContactDto>();
             var checkId=Contacts.FirstOrDefault(c=>c.Id==id);
-            if(checkId==null)
-            {
-                serviceResponse.Data=null;
-                serviceResponse.Success=false;
-                serviceResponse.Message=$"Id {id} Not Found";
-                return serviceResponse;
-            }
 
-            serviceResponse.Data=checkId;
+            try
+            {
+                if(checkId!=null)
+                {
+                    serviceResponse.Data=_mapper.Map<GetContactDto>(checkId);
+                }
+                else
+                {
+                    serviceResponse.Data=null;
+                    serviceResponse.Success=false;
+                    serviceResponse.Message=$"Id {id} Not Found";
+                }
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success=false;
+                serviceResponse.Message=ex.Message;
+            }
 
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<Contact>>> GetByName(string name)
+        public async Task<ServiceResponse<List<GetContactDto>>> GetByName(string name)
         {
-            var serviceResponse=new ServiceResponse<List<Contact>>();
+            var serviceResponse=new ServiceResponse<List<GetContactDto>>();
 
             var matchedContacts=new List<Contact>();
             foreach(Contact contact in Contacts)
@@ -87,56 +115,85 @@ namespace Project1.Services.ContactServices
                     matchedContacts.Add(contact);
                 }
             }
-            if(matchedContacts.Count==0)
+
+            try
             {
-                serviceResponse.Data=null;
-                serviceResponse.Success=false;
-                serviceResponse.Message=$"Name containing {name} Not Found";
-                return serviceResponse;
+                if(matchedContacts.Count>=1)
+                {
+                    serviceResponse.Data=matchedContacts.Select(mc=>_mapper.Map<GetContactDto>(mc)).ToList();
+                }
+                else
+                {
+                    serviceResponse.Data=null;
+                    serviceResponse.Success=false;
+                    serviceResponse.Message=$"Name containing {name} Not Found";
+                }
+                
             }
-            
-            serviceResponse.Data=matchedContacts;
-            
+            catch(Exception ex)
+            {
+                serviceResponse.Success=false;
+                serviceResponse.Message=ex.Message;
+            }
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<Contact>> Update(Contact updatedContact)
+        public async Task<ServiceResponse<GetContactDto>> Update(UpdateContactDto updatedContact)
         {
-            var serviceResponse=new ServiceResponse<Contact>();
+            var serviceResponse=new ServiceResponse<GetContactDto>();
+            var convContact=_mapper.Map<Contact>(updatedContact);
 
-            var checkContact=Contacts.FirstOrDefault(c=>c.Id==updatedContact.Id);
-            if(checkContact==null)
+            try
             {
-                serviceResponse.Data=null;
-                serviceResponse.Success=false;
-                serviceResponse.Message=$"Id {updatedContact.Id} Not Found";
-                return serviceResponse;
-            }
-            checkContact.Name=updatedContact.Name;
-            checkContact.Email=updatedContact.Email;
-            checkContact.OrganisationId=updatedContact.OrganisationId;
+                var checkContact=Contacts.FirstOrDefault(c=>c.Id==updatedContact.Id);
+                if(checkContact!=null)
+                {
+                    checkContact.Name=updatedContact.Name;
+                    checkContact.Email=updatedContact.Email;
+                    checkContact.OrganisationId=updatedContact.OrganisationId;
+                    serviceResponse.Data=_mapper.Map<GetContactDto>(checkContact);
+                }
+                else
+                {
+                    serviceResponse.Data=null;
+                    serviceResponse.Success=false;
+                    serviceResponse.Message=$"Id {updatedContact.Id} Not Found";
+                }
 
-            serviceResponse.Data=checkContact;
-            
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success=false;
+                serviceResponse.Message=ex.Message;
+            }
+
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<Contact>>> Delete(int id)
+        public async Task<ServiceResponse<List<GetContactDto>>> Delete(int id)
         {
-            var serviceResponse=new ServiceResponse<List<Contact>>();
-
+            var serviceResponse=new ServiceResponse<List<GetContactDto>>();
             var toDelete=Contacts.FirstOrDefault(c=>c.Id==id);
 
-            if(toDelete==null)
+            try
             {
-                serviceResponse.Data=null;
-                serviceResponse.Success=false;
-                serviceResponse.Message=$"Id {id} Not Found";
-                return serviceResponse;
+                if(toDelete!=null)
+                {
+                    Contacts.Remove(toDelete);
+                    serviceResponse.Data=Contacts.Select(c=>_mapper.Map<GetContactDto>(c)).ToList();
+                }
+                else
+                {
+                    serviceResponse.Data=null;
+                    serviceResponse.Success=false;
+                    serviceResponse.Message=$"Id {id} Not Found";
+                }
             }
-            Contacts.Remove(toDelete);
-
-            serviceResponse.Data=Contacts;
+            catch(Exception ex)
+            {
+                serviceResponse.Success=false;
+                serviceResponse.Message=ex.Message;
+            }
 
             return serviceResponse;
         }

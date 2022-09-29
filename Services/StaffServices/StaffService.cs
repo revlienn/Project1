@@ -32,7 +32,7 @@ namespace Project1.Services.StaffServices
             }
         };
 
-        public IMapper Mapper { get; }
+        //public IMapper Mapper { get; }
 
         public async Task<ServiceResponse<GetDto>> AddNew(AddDto newStaff)
         {

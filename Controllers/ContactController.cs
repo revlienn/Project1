@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Project1.Dtos.Contact;
 using Project1.Services.ContactServices;
 
 namespace Project1.Controllers
@@ -19,7 +20,7 @@ namespace Project1.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ServiceResponse<Contact>>> AddNew(Contact newContact)
+        public async Task<ActionResult<ServiceResponse<GetContactDto>>> AddNew(AddContactDto newContact)
         {   
             var addedContact=await _contactService.AddNew(newContact);
             if(addedContact.Data==null)
@@ -30,7 +31,7 @@ namespace Project1.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<ServiceResponse<Contact>>> Update(Contact updatedContact)
+        public async Task<ActionResult<ServiceResponse<GetContactDto>>> Update(UpdateContactDto updatedContact)
         {
             var checkContact=await _contactService.Update(updatedContact);
             if(checkContact.Data==null)
@@ -41,7 +42,7 @@ namespace Project1.Controllers
         }
 
         [HttpDelete]
-        public async Task<ActionResult<ServiceResponse<List<Contact>>>> Delete(int id)
+        public async Task<ActionResult<ServiceResponse<List<GetContactDto>>>> Delete(int id)
         {
             var toDelete=await _contactService.Delete(id);
             if(toDelete.Data==null)
@@ -52,13 +53,13 @@ namespace Project1.Controllers
         }
 
         [HttpGet("All")]
-        public async Task<ActionResult<ServiceResponse<List<Contact>>>> GetAll()
+        public async Task<ActionResult<ServiceResponse<List<GetContactDto>>>> GetAll()
         {
             return Ok(await _contactService.GetAll());
         }
 
         [HttpGet("ById")]
-        public async Task<ActionResult<ServiceResponse<Contact>>> GetById(int id)
+        public async Task<ActionResult<ServiceResponse<GetContactDto>>> GetById(int id)
         {
             var checkId=await _contactService.GetById(id);
             if(checkId.Data==null)
@@ -69,7 +70,7 @@ namespace Project1.Controllers
         }
 
         [HttpGet("ByName")]
-        public async Task<ActionResult<ServiceResponse<List<Contact>>>> GetByName(string name)
+        public async Task<ActionResult<ServiceResponse<List<GetContactDto>>>> GetByName(string name)
         {
             var matchedContacts=await _contactService.GetByName(name);
             if (matchedContacts.Data==null)
