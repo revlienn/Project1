@@ -8,11 +8,11 @@ namespace Project1.Services.StaffServices
 {
     public interface IStaffService
     {
-        Task<ServiceResponse<List<GetDto>>> GetAll();
-        Task<ServiceResponse<GetDto>> GetById(int id);
-        Task<ServiceResponse<List<GetDto>>> GetByName(string name);
-        Task<ServiceResponse<GetDto>> AddNew(AddDto newStaff);
-        Task<ServiceResponse<GetDto>> Update(UpdateDto updatedStaff);
-        Task<ServiceResponse<List<GetDto>>> Delete(int id);
+        Task<ServiceResponse<List<GetStaffDto>>> GetAll();
+        Task<ServiceResponse<GetStaffDto>> GetById(int id);
+        Task<ServiceResponse<List<GetStaffDto>>> GetByName(string name);
+        Task<ServiceResponse<GetStaffDto>> AddNew(AddStaffDto newStaff);
+        Task<ServiceResponse<GetStaffDto>> Update(UpdateStaffDto updatedStaff);
+        Task<ServiceResponse<List<GetStaffDto>>> Delete(int id);
     }
 }

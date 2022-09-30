@@ -12,8 +12,8 @@ namespace Project1
     {
         public AutoMapperProfile()
         {
-            CreateMap<AddDto,Staff>();
-            CreateMap<Staff,GetDto>();
+            CreateMap<AddStaffDto,Staff>();
+            CreateMap<Staff,GetStaffDto>();
 
             CreateMap<AddContactDto,Contact>();
             CreateMap<UpdateContactDto,Contact>();

@@ -21,7 +21,7 @@ namespace Project1.Controllers
 
 
         [HttpPost]
-        public async Task<ActionResult<ServiceResponse<GetDto>>> AddNew(AddDto newStaff)
+        public async Task<ActionResult<ServiceResponse<GetStaffDto>>> AddNew(AddStaffDto newStaff)
         {   
             var addedStaff=await _staffService.AddNew(newStaff);
             if(addedStaff.Data==null)
@@ -32,7 +32,7 @@ namespace Project1.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<ServiceResponse<GetDto>>> Update(UpdateDto updatedStaff)
+        public async Task<ActionResult<ServiceResponse<GetStaffDto>>> Update(UpdateStaffDto updatedStaff)
         {
             var checkStaff=await _staffService.Update(updatedStaff);
             if(checkStaff.Data==null)
@@ -43,7 +43,7 @@ namespace Project1.Controllers
         }
 
         [HttpDelete]
-        public async Task<ActionResult<ServiceResponse<List<GetDto>>>> Delete(int id)
+        public async Task<ActionResult<ServiceResponse<List<GetStaffDto>>>> Delete(int id)
         {
             var toDelete=await _staffService.Delete(id);
             if(toDelete.Data==null)
@@ -54,13 +54,13 @@ namespace Project1.Controllers
         }
 
         [HttpGet("All")]
-        public async Task<ActionResult<ServiceResponse<List<GetDto>>>> GetAll()
+        public async Task<ActionResult<ServiceResponse<List<GetStaffDto>>>> GetAll()
         {
             return Ok(await _staffService.GetAll());
         }
 
         [HttpGet("ById")]
-        public async Task<ActionResult<ServiceResponse<GetDto>>> GetById(int id)
+        public async Task<ActionResult<ServiceResponse<GetStaffDto>>> GetById(int id)
         {
             var checkId=await _staffService.GetById(id);
             if(checkId.Data==null)
@@ -71,7 +71,7 @@ namespace Project1.Controllers
         }
 
         [HttpGet("ByName")]
-        public async Task<ActionResult<ServiceResponse<List<GetDto>>>> GetByName(string name)
+        public async Task<ActionResult<ServiceResponse<List<GetStaffDto>>>> GetByName(string name)
         {
             var matchedStaffs=await _staffService.GetByName(name);
             if (matchedStaffs.Data==null)

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Project1.Dtos.Staff
 {
-    public class GetDto
+    public class GetStaffDto
     {
         public int Id { get; set; }=1;
         public string Name { get; set; }="Jane Doe";

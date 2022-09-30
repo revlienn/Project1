@@ -9,6 +9,6 @@ namespace Project1.Dtos.Contact
     {
         public string Name { get; set; }="Jane Doe";
         public string Email { get; set; }="test@companyname.com";
-        public int OrganisationId { get; set; }=-1;
+        public int OrganisationId { get; set; }=int.MinValue;
     }
 }

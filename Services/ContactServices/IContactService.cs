@@ -8,12 +8,12 @@ namespace Project1.Services.ContactServices
 {
     public interface IContactService
     {
-        Task<ServiceResponse<List<GetContactDto>>> GetAll();
-        Task<ServiceResponse<GetContactDto>> GetById(int id);
-        Task<ServiceResponse<List<GetContactDto>>> GetByName(string name);
         Task<ServiceResponse<GetContactDto>> AddNew(AddContactDto newContact);
         Task<ServiceResponse<GetContactDto>> Update(UpdateContactDto updatedContact);
         Task<ServiceResponse<List<GetContactDto>>> Delete(int id);
+        Task<ServiceResponse<List<GetContactDto>>> GetAll();
+        Task<ServiceResponse<GetContactDto>> GetById(int id);
+        Task<ServiceResponse<List<GetContactDto>>> GetByName(string name);
 
     }
 }
