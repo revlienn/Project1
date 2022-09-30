@@ -23,7 +23,7 @@ namespace Project1.Controllers
         public async Task<ActionResult<ServiceResponse<GetContactDto>>> AddNew(AddContactDto newContact)
         {   
             var addedContact=await _contactService.AddNew(newContact);
-            if(addedContact.Data==null)
+            if(addedContact.Success==false)
             {
                 return Conflict(addedContact);
             }

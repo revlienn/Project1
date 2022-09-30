@@ -2,11 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Project1.Dtos.Project;
 
 namespace Project1.Services.ProjectServices
 {
     public class ProjectService : IProjectService
     {
+        private readonly IMapper _mapper;
+        public ProjectService(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
 
         private List<Project> Projects=new List<Project>
         {
@@ -24,118 +31,160 @@ namespace Project1.Services.ProjectServices
             },
         };
         
-        public async Task<ServiceResponse<Project>> AddNew(Project newProject)
+
+        public async Task<ServiceResponse<GetProjectDto>> AddNew(AddProjectDto newProject)
         {
-            var serviceResponse=new ServiceResponse<Project>();
+            var serviceResponse=new ServiceResponse<GetProjectDto>();
+            var addedProject=_mapper.Map<Project>(newProject);
 
-            var checkProject=Projects.FirstOrDefault(c=>c.Id==newProject.Id);
-            if(checkProject!=null)
-            {
-                serviceResponse.Data=null;
-                serviceResponse.Success=false;
-                serviceResponse.Message=$"Id {newProject.Id} has been assigned to a different project";
-                return serviceResponse;
-            }
-            Projects.Add(newProject);
-
-            serviceResponse.Data=newProject;
-            serviceResponse.Message=$"Project {newProject.Id} successfully added.";
-            return serviceResponse;
-        }
-
-        public async Task<ServiceResponse<List<Project>>> GetAll()
-        {
-            var serviceResponse=new ServiceResponse<List<Project>>();
-
-            serviceResponse.Data=Projects;
-
-            return serviceResponse;
-        }
-
-        public async Task<ServiceResponse<Project>> GetById(int id)
-        {
-            var serviceResponse=new ServiceResponse<Project>();
-
-            var checkId=Projects.FirstOrDefault(c=>c.Id==id);
-            if(checkId==null)
-            {
-                serviceResponse.Data=null;
-                serviceResponse.Success=false;
-                serviceResponse.Message=$"Id {id} Not Found";
-                return serviceResponse;
-            }
-
-            serviceResponse.Data=checkId;
-
-            return serviceResponse;
-        }
-
-        public async Task<ServiceResponse<List<Project>>> GetByName(string name)
-        {
-            var serviceResponse=new ServiceResponse<List<Project>>();
-
-            var matchedProjects=new List<Project>();
-            foreach(Project Project in Projects)
-            {
-                if(Project.Name.ToLower().Contains(name))
+            try
                 {
-                    matchedProjects.Add(Project);
+                    addedProject.Id=Projects.Max(c=>c.Id)+1;
+                    Projects.Add(addedProject);
+                    serviceResponse.Data=_mapper.Map<GetProjectDto>(addedProject);
+                    serviceResponse.Message=$"User {addedProject.Name} successfully added.";
+                    
                 }
-            }
-            if(matchedProjects.Count==0)
-            {
-                serviceResponse.Data=null;
+            catch(Exception ex)
+                {
                 serviceResponse.Success=false;
-                serviceResponse.Message=$"Name containing {name} Not Found";
-                return serviceResponse;
-            }
-            
-            serviceResponse.Data=matchedProjects;
-            
+                serviceResponse.Message=ex.Message;
+                }
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<Project>> Update(Project updatedProject)
+        
+        public async Task<ServiceResponse<GetProjectDto>> Update(UpdateProjectDto updatedProject)
         {
-            var serviceResponse=new ServiceResponse<Project>();
+            var serviceResponse=new ServiceResponse<GetProjectDto>();
 
-            var checkProject=Projects.FirstOrDefault(c=>c.Id==updatedProject.Id);
-            if(checkProject==null)
+            try
             {
-                serviceResponse.Data=null;
-                serviceResponse.Success=false;
-                serviceResponse.Message=$"Id {updatedProject.Id} Not Found";
-                return serviceResponse;
-            }
-            checkProject.Name=updatedProject.Name;
-            checkProject.AccAmount=updatedProject.AccAmount;
-            checkProject.MainContact=updatedProject.MainContact;
-            checkProject.Staffs=updatedProject.Staffs;
+                var checkProject=Projects.FirstOrDefault(c=>c.Id==updatedProject.Id);
+                if(checkProject!=null)
+                {
+                    checkProject.Name=updatedProject.Name;
+                    checkProject.AccAmount=updatedProject.AccAmount;
+                    checkProject.MainContact=updatedProject.MainContact;
+                    checkProject.Staffs=updatedProject.Staffs;
+                    serviceResponse.Data=_mapper.Map<GetProjectDto>(checkProject);
+                }
+                else
+                {
+                    serviceResponse.Data=null;
+                    serviceResponse.Success=false;
+                    serviceResponse.Message=$"Id {updatedProject.Id} Not Found";
+                }
 
-            serviceResponse.Data=checkProject;
-            
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success=false;
+                serviceResponse.Message=ex.Message;
+            }
+
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<Project>>> Delete(int id)
+        public async Task<ServiceResponse<List<GetProjectDto>>> Delete(int id)
         {
-            var serviceResponse=new ServiceResponse<List<Project>>();
-
+            var serviceResponse=new ServiceResponse<List<GetProjectDto>>();
             var toDelete=Projects.FirstOrDefault(c=>c.Id==id);
 
-            if(toDelete==null)
+            try
             {
-                serviceResponse.Data=null;
-                serviceResponse.Success=false;
-                serviceResponse.Message=$"Id {id} Not Found";
-                return serviceResponse;
+                if(toDelete!=null)
+                {
+                    Projects.Remove(toDelete);
+                    serviceResponse.Data=Projects.Select(c=>_mapper.Map<GetProjectDto>(c)).ToList();
+                }
+                else
+                {
+                    serviceResponse.Data=null;
+                    serviceResponse.Success=false;
+                    serviceResponse.Message=$"Id {id} Not Found";
+                }
             }
-            Projects.Remove(toDelete);
-
-            serviceResponse.Data=Projects;
+            catch(Exception ex)
+            {
+                serviceResponse.Success=false;
+                serviceResponse.Message=ex.Message;
+            }
 
             return serviceResponse;
         }
-    }
     
+
+        public async Task<ServiceResponse<List<GetProjectDto>>> GetAll()
+        {
+            var serviceResponse=new ServiceResponse<List<GetProjectDto>>();
+
+            serviceResponse.Data=Projects.Select(p=>_mapper.Map<GetProjectDto>(p)).ToList();
+
+            return serviceResponse;
+        }
+
+        public async Task<ServiceResponse<GetProjectDto>> GetById(int id)
+        {
+            var serviceResponse=new ServiceResponse<GetProjectDto>();
+            var checkId=Projects.FirstOrDefault(c=>c.Id==id);
+
+            try
+            {
+                if(checkId!=null)
+                {
+                    serviceResponse.Data=_mapper.Map<GetProjectDto>(checkId);
+                }
+                else
+                {
+                    serviceResponse.Data=null;
+                    serviceResponse.Success=false;
+                    serviceResponse.Message=$"Id {id} Not Found";
+                }
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success=false;
+                serviceResponse.Message=ex.Message;
+            }
+
+            return serviceResponse;
+        }
+
+        public async Task<ServiceResponse<List<GetProjectDto>>> GetByName(string name)
+        {
+            var serviceResponse=new ServiceResponse<List<GetProjectDto>>();
+
+            var matchedProjects=new List<Project>();
+            foreach(Project project in Projects)
+            {
+                if(project.Name.ToLower().Contains(name.ToLower()))
+                {
+                    matchedProjects.Add(project);
+                }
+            }
+
+            try
+            {
+                if(matchedProjects.Count>=1)
+                {
+                    serviceResponse.Data=matchedProjects.Select(mc=>_mapper.Map<GetProjectDto>(mc)).ToList();
+                }
+                else
+                {
+                    serviceResponse.Data=null;
+                    serviceResponse.Success=false;
+                    serviceResponse.Message=$"Name containing {name} Not Found";
+                }
+                
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success=false;
+                serviceResponse.Message=ex.Message;
+            }
+            return serviceResponse;
+        }
+
+    }
 }

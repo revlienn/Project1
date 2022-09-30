@@ -45,7 +45,6 @@ namespace Project1.Services.StaffServices
                     Staffs.Add(addedStaff);
                     serviceResponse.Data=_mapper.Map<GetStaffDto>(addedStaff);
                     serviceResponse.Message=$"User {addedStaff.Name} successfully added.";
-                    
                 }
             catch(Exception ex)
                 {

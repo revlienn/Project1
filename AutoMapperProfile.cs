@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Project1.Dtos.Contact;
+using Project1.Dtos.Project;
 using Project1.Dtos.Staff;
 
 namespace Project1
@@ -18,6 +19,9 @@ namespace Project1
             CreateMap<AddContactDto,Contact>();
             CreateMap<UpdateContactDto,Contact>();
             CreateMap<Contact,GetContactDto>();
+
+            CreateMap<AddProjectDto,Project>();
+            CreateMap<Project,GetProjectDto>();
             
         }
     }

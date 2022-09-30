@@ -24,7 +24,7 @@ namespace Project1.Controllers
         public async Task<ActionResult<ServiceResponse<GetStaffDto>>> AddNew(AddStaffDto newStaff)
         {   
             var addedStaff=await _staffService.AddNew(newStaff);
-            if(addedStaff.Data==null)
+            if(addedStaff.Success==false)
             {
                 return Conflict(addedStaff);
             }
