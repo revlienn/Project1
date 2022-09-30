@@ -36,7 +36,8 @@ namespace Project1.Controllers
             var checkProject=await _projectService.Update(updatedProject);
             if(checkProject.Data==null)
             {
-                return StatusCode(404,"Id Not Found");
+                //return StatusCode(404,"Id Not Found");
+                return NotFound(checkProject);
             }
             else if(checkProject.Success==false)
             {

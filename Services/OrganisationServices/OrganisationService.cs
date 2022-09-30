@@ -2,11 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using Project1.Dtos.Organisation;
 
 namespace Project1.Services.OrganisationServices
 {
     public class OrganisationService:IOrganisationService
     {
+        private readonly IMapper _mapper;
+        public OrganisationService(IMapper mapper)
+        {
+            _mapper = mapper;
+        }
         private List<Organisation> Organisations=new List<Organisation>
         {
             new Organisation()
@@ -28,118 +35,160 @@ namespace Project1.Services.OrganisationServices
                 Phone="020-94638000"
             },
         };
+        
 
-        public async Task<ServiceResponse<Organisation>> AddNew(Organisation newOrganisation)
+        public async Task<ServiceResponse<GetOrganisationDto>> AddNew(AddOrganisationDto newOrganisation)
         {
-            var serviceResponse=new ServiceResponse<Organisation>();
+            var serviceResponse=new ServiceResponse<GetOrganisationDto>();
+            var addedOrganisation=_mapper.Map<Organisation>(newOrganisation);
 
-            var checkOrganisation=Organisations.FirstOrDefault(c=>c.Id==newOrganisation.Id);
-            if(checkOrganisation!=null)
-            {
-                serviceResponse.Data=null;
-                serviceResponse.Success=false;
-                serviceResponse.Message=$"Id {newOrganisation.Id} has been assigned to a different Organisation";
-                return serviceResponse;
-            }
-            Organisations.Add(newOrganisation);
-
-            serviceResponse.Data=newOrganisation;
-            serviceResponse.Message=$"Organisation {newOrganisation.Id} successfully added.";
-            return serviceResponse;
-        }
-
-        public async Task<ServiceResponse<List<Organisation>>> GetAll()
-        {
-            var serviceResponse=new ServiceResponse<List<Organisation>>();
-
-            serviceResponse.Data=Organisations;
-
-            return serviceResponse;
-        }
-
-        public async Task<ServiceResponse<Organisation>> GetById(int id)
-        {
-            var serviceResponse=new ServiceResponse<Organisation>();
-
-            var checkId=Organisations.FirstOrDefault(c=>c.Id==id);
-            if(checkId==null)
-            {
-                serviceResponse.Data=null;
-                serviceResponse.Success=false;
-                serviceResponse.Message=$"Id {id} Not Found";
-                return serviceResponse;
-            }
-
-            serviceResponse.Data=checkId;
-
-            return serviceResponse;
-        }
-
-        public async Task<ServiceResponse<List<Organisation>>> GetByName(string name)
-        {
-            var serviceResponse=new ServiceResponse<List<Organisation>>();
-
-            var matchedOrganisations=new List<Organisation>();
-            foreach(Organisation Organisation in Organisations)
-            {
-                if(Organisation.Name.ToLower().Contains(name))
+            try
                 {
-                    matchedOrganisations.Add(Organisation);
+                    addedOrganisation.Id=Organisations.Max(c=>c.Id)+1;
+                    Organisations.Add(addedOrganisation);
+                    serviceResponse.Data=_mapper.Map<GetOrganisationDto>(addedOrganisation);
+                    serviceResponse.Message=$"User {addedOrganisation.Name} successfully added.";
+                    
                 }
-            }
-            if(matchedOrganisations.Count==0)
-            {
-                serviceResponse.Data=null;
+            catch(Exception ex)
+                {
                 serviceResponse.Success=false;
-                serviceResponse.Message=$"Name containing {name} Not Found";
-                return serviceResponse;
-            }
-            
-            serviceResponse.Data=matchedOrganisations;
-            
+                serviceResponse.Message=ex.Message;
+                }
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<Organisation>> Update(Organisation updatedOrganisation)
+        public async Task<ServiceResponse<GetOrganisationDto>> Update(UpdateOrganisationDto updatedOrganisation)
         {
-            var serviceResponse=new ServiceResponse<Organisation>();
+            var serviceResponse=new ServiceResponse<GetOrganisationDto>();
 
-            var checkOrganisation=Organisations.FirstOrDefault(c=>c.Id==updatedOrganisation.Id);
-            if(checkOrganisation==null)
+            try
             {
-                serviceResponse.Data=null;
-                serviceResponse.Success=false;
-                serviceResponse.Message=$"Id {updatedOrganisation.Id} Not Found";
-                return serviceResponse;
-            }
-            checkOrganisation.Name=updatedOrganisation.Name;
-            checkOrganisation.Phone=updatedOrganisation.Phone;
-            checkOrganisation.Contacts=updatedOrganisation.Contacts;
-            checkOrganisation.Projects=updatedOrganisation.Projects;
+                var checkOrganisation=Organisations.FirstOrDefault(c=>c.Id==updatedOrganisation.Id);
+                if(checkOrganisation!=null)
+                {
+                    checkOrganisation.Name=updatedOrganisation.Name;
+                    checkOrganisation.Phone=updatedOrganisation.Phone;
+                    checkOrganisation.Contacts=updatedOrganisation.Contacts;
+                    checkOrganisation.Projects=updatedOrganisation.Projects;
+                    serviceResponse.Data=_mapper.Map<GetOrganisationDto>(checkOrganisation);
+                }
+                else
+                {
+                    serviceResponse.Data=null;
+                    serviceResponse.Success=false;
+                    serviceResponse.Message=$"Id {updatedOrganisation.Id} Not Found";
+                }
 
-            serviceResponse.Data=checkOrganisation;
-            
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success=false;
+                serviceResponse.Message=ex.Message;
+            }
+
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<Organisation>>> Delete(int id)
+        public async Task<ServiceResponse<List<GetOrganisationDto>>> Delete(int id)
         {
-            var serviceResponse=new ServiceResponse<List<Organisation>>();
-
+            var serviceResponse=new ServiceResponse<List<GetOrganisationDto>>();
             var toDelete=Organisations.FirstOrDefault(c=>c.Id==id);
 
-            if(toDelete==null)
+            try
             {
-                serviceResponse.Data=null;
-                serviceResponse.Success=false;
-                serviceResponse.Message=$"Id {id} Not Found";
-                return serviceResponse;
+                if(toDelete!=null)
+                {
+                    Organisations.Remove(toDelete);
+                    serviceResponse.Data=Organisations.Select(c=>_mapper.Map<GetOrganisationDto>(c)).ToList();
+                }
+                else
+                {
+                    serviceResponse.Data=null;
+                    serviceResponse.Success=false;
+                    serviceResponse.Message=$"Id {id} Not Found";
+                }
             }
-            Organisations.Remove(toDelete);
-
-            serviceResponse.Data=Organisations;
+            catch(Exception ex)
+            {
+                serviceResponse.Success=false;
+                serviceResponse.Message=ex.Message;
+            }
 
             return serviceResponse;
         }
+
+        public async Task<ServiceResponse<List<GetOrganisationDto>>> GetAll()
+        {
+            var serviceResponse=new ServiceResponse<List<GetOrganisationDto>>();
+
+            serviceResponse.Data=Organisations.Select(o=>_mapper.Map<GetOrganisationDto>(o)).ToList();
+
+            return serviceResponse;
+        }
+
+        public async Task<ServiceResponse<GetOrganisationDto>> GetById(int id)
+        {
+            var serviceResponse=new ServiceResponse<GetOrganisationDto>();
+            var checkId=Organisations.FirstOrDefault(c=>c.Id==id);
+
+            try
+            {
+                if(checkId!=null)
+                {
+                    serviceResponse.Data=_mapper.Map<GetOrganisationDto>(checkId);
+                }
+                else
+                {
+                    serviceResponse.Data=null;
+                    serviceResponse.Success=false;
+                    serviceResponse.Message=$"Id {id} Not Found";
+                }
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success=false;
+                serviceResponse.Message=ex.Message;
+            }
+
+            return serviceResponse;
+        }
+
+        public async Task<ServiceResponse<List<GetOrganisationDto>>> GetByName(string name)
+        {
+            var serviceResponse=new ServiceResponse<List<GetOrganisationDto>>();
+
+            var matchedOrganisations=new List<Organisation>();
+            foreach(Organisation organisation in Organisations)
+            {
+                if(organisation.Name.ToLower().Contains(name.ToLower()))
+                {
+                    matchedOrganisations.Add(organisation);
+                }
+            }
+
+            try
+            {
+                if(matchedOrganisations.Count>=1)
+                {
+                    serviceResponse.Data=matchedOrganisations.Select(mc=>_mapper.Map<GetOrganisationDto>(mc)).ToList();
+                }
+                else
+                {
+                    serviceResponse.Data=null;
+                    serviceResponse.Success=false;
+                    serviceResponse.Message=$"Name containing {name} Not Found";
+                }
+                
+            }
+            catch(Exception ex)
+            {
+                serviceResponse.Success=false;
+                serviceResponse.Message=ex.Message;
+            }
+            return serviceResponse;
+        }
+
+        
     }
 }

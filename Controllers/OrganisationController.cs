@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Project1.Dtos.Organisation;
 using Project1.Services.OrganisationServices;
 
 namespace Project1.Controllers
@@ -19,7 +20,7 @@ namespace Project1.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<ServiceResponse<Organisation>>> AddNew(Organisation newOrganisation)
+        public async Task<ActionResult<ServiceResponse<GetOrganisationDto>>> AddNew(AddOrganisationDto newOrganisation)
         {   
             var addedOrganisation=await _organisationService.AddNew(newOrganisation);
             if(addedOrganisation.Data==null)
@@ -30,7 +31,7 @@ namespace Project1.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<ServiceResponse<Organisation>>> Update(Organisation updatedOrganisation)
+        public async Task<ActionResult<ServiceResponse<GetOrganisationDto>>> Update(UpdateOrganisationDto updatedOrganisation)
         {
             var checkOrganisation=await _organisationService.Update(updatedOrganisation);
             if(checkOrganisation.Data==null)
@@ -41,7 +42,7 @@ namespace Project1.Controllers
         }
 
         [HttpDelete]
-        public async Task<ActionResult<ServiceResponse<List<Organisation>>>> Delete(int id)
+        public async Task<ActionResult<ServiceResponse<List<GetOrganisationDto>>>> Delete(int id)
         {
             var toDelete=await _organisationService.Delete(id);
             if(toDelete.Data==null)
@@ -52,13 +53,13 @@ namespace Project1.Controllers
         }
 
         [HttpGet("All")]
-        public async Task<ActionResult<ServiceResponse<List<Organisation>>>> GetAll()
+        public async Task<ActionResult<ServiceResponse<List<GetOrganisationDto>>>> GetAll()
         {
             return Ok(await _organisationService.GetAll());
         }
 
         [HttpGet("ById")]
-        public async Task<ActionResult<ServiceResponse<Organisation>>> GetById(int id)
+        public async Task<ActionResult<ServiceResponse<GetOrganisationDto>>> GetById(int id)
         {
             var checkId=await _organisationService.GetById(id);
             if(checkId.Data==null)
@@ -69,7 +70,7 @@ namespace Project1.Controllers
         }
 
         [HttpGet("ByName")]
-        public async Task<ActionResult<ServiceResponse<List<Organisation>>>> GetByName(string name)
+        public async Task<ActionResult<ServiceResponse<List<GetOrganisationDto>>>> GetByName(string name)
         {
             var matchedOrganisations=await _organisationService.GetByName(name);
             if (matchedOrganisations.Data==null)
