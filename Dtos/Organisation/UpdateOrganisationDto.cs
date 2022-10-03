@@ -10,7 +10,7 @@ namespace Project1.Dtos.Organisation
         public int Id { get; set; }
         public string Name { get; set; }=string.Empty;
         public string Phone { get; set; }=string.Empty;
-        public List<Models.Contact>? Contacts  {get; set; }
-        public List<Models.Project>? Projects { get; set; }
+        public List<Models.Contact>? Contacts  {get; set; }=null;
+        public List<Models.Project>? Projects { get; set; }=null;
     }
 }

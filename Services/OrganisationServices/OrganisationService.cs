@@ -64,9 +64,10 @@ namespace Project1.Services.OrganisationServices
 
             try
             {
-                var checkOrganisation=Organisations.FirstOrDefault(c=>c.Id==updatedOrganisation.Id);
+                Organisation checkOrganisation=Organisations.FirstOrDefault(c=>c.Id==updatedOrganisation.Id);
                 if(checkOrganisation!=null)
                 {
+                    //_mapper.Map(updatedOrganisation,checkOrganisation);
                     checkOrganisation.Name=updatedOrganisation.Name;
                     checkOrganisation.Phone=updatedOrganisation.Phone;
                     checkOrganisation.Contacts=updatedOrganisation.Contacts;
