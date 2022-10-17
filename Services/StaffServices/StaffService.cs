@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Project1.Data;
 using Project1.Dtos.Staff;
+using Microsoft.EntityFrameworkCore;
 
 namespace Project1.Services.StaffServices
 {
@@ -11,9 +13,12 @@ namespace Project1.Services.StaffServices
     {
 
         private readonly IMapper _mapper;
-        public StaffService(IMapper mapper)
+        private readonly DataContext _context;
+
+        public StaffService(IMapper mapper,DataContext context)
         {
             _mapper = mapper;
+            _context = context;
         }
         private List<Staff> Staffs=new List<Staff>
         {
@@ -130,7 +135,9 @@ namespace Project1.Services.StaffServices
         {
             var serviceResponse=new ServiceResponse<List<GetStaffDto>>();
 
-            serviceResponse.Data=Staffs.Select(s=>_mapper.Map<GetStaffDto>(s)).ToList();
+            var dbCharacters=await _context.Staffs.ToListAsync();
+
+            serviceResponse.Data=dbCharacters.Select(s=>_mapper.Map<GetStaffDto>(s)).ToList();
 
             return serviceResponse;
         }
@@ -138,13 +145,15 @@ namespace Project1.Services.StaffServices
         public async Task<ServiceResponse<GetStaffDto>> GetById(int id)
         {
             var serviceResponse=new ServiceResponse<GetStaffDto>();
-            var checkId=Staffs.FirstOrDefault(c=>c.Id==id);
+            //var checkId=Staffs.FirstOrDefault(c=>c.Id==id);
+
+            var dbStaff=await _context.Staffs.FirstOrDefaultAsync(c=>c.Id==id);
 
             try
             {
-                if(checkId!=null)
+                if(dbStaff!=null)
                 {
-                    serviceResponse.Data=_mapper.Map<GetStaffDto>(checkId);
+                    serviceResponse.Data=_mapper.Map<GetStaffDto>(dbStaff);
                 }
                 else
                 {
